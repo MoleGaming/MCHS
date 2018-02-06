@@ -1,0 +1,15 @@
+main: com.OlmErb.MCHS.MCHS_main
+version: 0.1
+name: MCHS
+description: Hide and Seek in Minecraft!
+authors: [OlmErb]
+commands:
+  setHSPos:
+    description: Sets positions for the Hide and Seek game
+    usage: /setHSPos <lobby:wait:seeker:hider>
+  sethstime:
+    description: Sets time for hiding and seeking
+    usage: /sethstime <hide:seek> <seconds>
+  starths:
+    description: starts the game!
+    usage: /starths
