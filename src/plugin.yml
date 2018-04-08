@@ -13,3 +13,6 @@ commands:
   starths:
     description: starts the game!
     usage: /starths
+  disablehs:
+    description: disables this plugin
+    usage: /disablehs

@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,7 +43,7 @@ public class MCHS_main extends JavaPlugin implements Listener{
 	public Location hiderSpawn;
 	public Location seekerSpawn;
 	public World world;
-	private Collection<? extends Player> players;
+	private ArrayList<Player> players;
 	public int seekTime;
 	public int hideTime;
 	public int gameDuration;
@@ -77,12 +78,15 @@ public class MCHS_main extends JavaPlugin implements Listener{
 		this.getCommand("setHSPos").setExecutor(new MCHS_main());
 		this.getCommand("setHStime").setExecutor(new MCHS_main());
 		this.getCommand("starths").setExecutor(new MCHS_main());
+		this.getCommand("disablehs").setExecutor(new MCHS_main());
 	}
 	public boolean init(){
 		mg = Bukkit.getScoreboardManager();
 		sc = mg.getNewScoreboard();
-		Seekers = sc.registerNewTeam("Seekers");
-		Hiders = sc.registerNewTeam("Hiders");
+		if(sc.getEntries().contains("Seekers"))
+			Seekers = sc.registerNewTeam("Seekers");
+		if(sc.getEntries().contains("Hiders"))
+			Hiders = sc.registerNewTeam("Hiders");
 		inGame=false;
 		File data = new File("dat");
 		
@@ -191,7 +195,7 @@ public class MCHS_main extends JavaPlugin implements Listener{
 				s.sendMessage("Please select a location to set");
 				return false;
 			}
-			players = Bukkit.getOnlinePlayers();
+			players = new ArrayList<Player>(Bukkit.getOnlinePlayers());
 			Player p = getPlayer(players, s.getName());
 			Location pLoc = p.getLocation();
 			int pX = ((int) pLoc.getBlockX());
@@ -240,9 +244,21 @@ public class MCHS_main extends JavaPlugin implements Listener{
 		if(c.getName().equalsIgnoreCase("starths")){
 			inGame=true;
 			currentEvent="hide";
+			players = new ArrayList<Player>(Bukkit.getOnlinePlayers());
+			int r = (int)(Math.random()*players.size());
+			for(int i=0;i<players.size();i++){
+				Player p = players.get(i);
+				if(r==i){
+					Seekers.addEntry(p.getName());
+				}else{
+					Hiders.addEntry(p.getName());
+				}
+			}
 			gameTimer(hideTime);
+		}else
+		if(c.getName().equalsIgnoreCase("disablehs")){
+			Bukkit.getPluginManager().disablePlugin(this);
 		}
-		
 		return true;
 	}
 	
@@ -282,6 +298,7 @@ public class MCHS_main extends JavaPlugin implements Listener{
 			if(e instanceof Player&&Hiders.hasEntry(e.getName())){
 				Player p = getPlayer(Bukkit.getOnlinePlayers(), e.getName());
 				if(Seekers.hasEntry(p.getName())){
+					ev.getPlayer().sendMessage(ChatColor.RED+"You have been caught!");
 					Hiders.removeEntry(ev.getPlayer().getName());
 					Seekers.addEntry(ev.getPlayer().getName());
 				}
